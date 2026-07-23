@@ -48,16 +48,11 @@
     proxima.disabled = true;
   };
 
-  const abrirPdf = (url) => {
-    window.open(url, "_blank", "noopener,noreferrer");
-  };
-
   const criarEdicao = (edicao, indice) => {
     const numero = obterNumero(edicao, indice);
     const pdfUrl = typeof edicao.pdf_url === "string" ? edicao.pdf_url.trim() : "";
-    const botao = document.createElement("button");
+    const botao = pdfUrl ? document.createElement("a") : document.createElement("button");
 
-    botao.type = "button";
     botao.className = "edition-tile";
     botao.dataset.index = String(indice);
     botao.setAttribute("aria-label", pdfUrl
@@ -66,18 +61,21 @@
 
     const numeroVisivel = document.createElement("span");
     numeroVisivel.className = "tile-number";
-    numeroVisivel.textContent = numero;
+    numeroVisivel.textContent = `Edição ${numero}`;
     botao.appendChild(numeroVisivel);
 
-    if (!pdfUrl) {
-      botao.disabled = true;
-      botao.classList.add("is-unavailable");
-    } else {
+    if (pdfUrl) {
+      botao.href = pdfUrl;
+      botao.target = "_blank";
+      botao.rel = "noopener noreferrer";
       botao.addEventListener("click", () => {
         indiceAtivo = indice;
         atualizarCarrossel();
-        abrirPdf(pdfUrl);
       });
+    } else {
+      botao.type = "button";
+      botao.disabled = true;
+      botao.classList.add("is-unavailable");
     }
 
     return botao;
