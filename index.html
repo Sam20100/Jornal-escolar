@@ -3,27 +3,69 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Raízes do Futuro — Arquivo Digital</title>
+  <meta name="theme-color" content="#0b0d12">
+  <title>Raízes do Futuro | Edições</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Lora:wght@400&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>
-    <h1>Raízes do Futuro</h1>
-    <p>Memória viva da nossa história</p>
-  </header>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="./" aria-label="Raízes do Futuro, página inicial">
+        <span class="brand-mark" aria-hidden="true">RF</span>
+        <span>Raízes do Futuro</span>
+      </a>
+      <p class="topbar-label">Arquivo escolar</p>
+    </header>
 
-  <main id="edicoes">
-    <div id="loading">Carregando edições...</div>
-    <div id="erro" hidden></div>
-  </main>
+    <main>
+      <section class="intro" aria-labelledby="page-title">
+        <p class="eyebrow">Jornal digital</p>
+        <h1 id="page-title">Escolha uma edição.</h1>
+        <p class="intro-copy">Um registro vivo das histórias, ideias e vozes da nossa escola.</p>
+      </section>
 
-  <footer>
-    <p>Raízes do Futuro &copy; 2026</p>
-    <p>Desenvolvido e mantido por Samuel Marques</p>
-  </footer>
+      <section class="edition-selector" aria-labelledby="selector-title">
+        <div class="selector-heading">
+          <div>
+            <p class="section-label">Edições</p>
+            <h2 id="selector-title">Arquivo completo</h2>
+          </div>
+          <span class="edition-count" id="edition-count" aria-live="polite">--</span>
+        </div>
+
+        <div class="carousel-layout">
+          <button class="carousel-control" id="previous-edition" type="button" aria-label="Edição anterior" title="Edição anterior">
+            <span aria-hidden="true">←</span>
+          </button>
+
+          <div class="carousel-viewport" id="carousel-viewport">
+            <div class="carousel-track" id="edition-track" aria-live="polite"></div>
+          </div>
+
+          <button class="carousel-control" id="next-edition" type="button" aria-label="Próxima edição" title="Próxima edição">
+            <span aria-hidden="true">→</span>
+          </button>
+        </div>
+
+        <div class="carousel-progress" aria-hidden="true">
+          <span id="progress-fill"></span>
+        </div>
+        <p class="selection-status" id="selection-status" aria-live="polite"></p>
+      </section>
+
+      <div class="state-message" id="loading" role="status">Carregando edições...</div>
+      <div class="state-message state-message-error" id="erro" role="alert" hidden></div>
+    </main>
+
+    <footer class="footer">
+      <span>Raízes do Futuro</span>
+      <span aria-hidden="true">•</span>
+      <span>2026</span>
+    </footer>
+  </div>
 
   <script src="supabase.js"></script>
   <script src="app.js"></script>
