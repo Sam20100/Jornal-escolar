@@ -13,6 +13,7 @@
   let indiceAtivo = 0;
   let inicioDoArraste = null;
   let idDoPonteiro = null;
+  let arrasteFoiDetectado = false;
   let frameDeRedimensionamento = null;
 
   const obterNumero = (edicao, indice) => {
@@ -68,9 +69,12 @@
       botao.href = pdfUrl;
       botao.target = "_blank";
       botao.rel = "noopener noreferrer";
-      botao.addEventListener("click", () => {
-        indiceAtivo = indice;
-        atualizarCarrossel();
+      botao.addEventListener("click", (evento) => {
+        if (arrasteFoiDetectado) {
+          evento.preventDefault();
+          evento.stopPropagation();
+          arrasteFoiDetectado = false;
+        }
       });
     } else {
       botao.type = "button";
@@ -171,9 +175,11 @@
 
     const deslocamentoX = evento.clientX - inicioDoArraste.x;
     const deslocamentoY = evento.clientY - inicioDoArraste.y;
+    const foiArraste = Math.abs(deslocamentoX) > 8 || Math.abs(deslocamentoY) > 8;
     inicioDoArraste = null;
     idDoPonteiro = null;
     viewport.classList.remove("is-dragging");
+    arrasteFoiDetectado = foiArraste;
 
     if (Math.abs(deslocamentoX) > 40 && Math.abs(deslocamentoX) > Math.abs(deslocamentoY)) {
       moverCarrossel(deslocamentoX < 0 ? 1 : -1);
@@ -190,12 +196,22 @@
 
     inicioDoArraste = { x: evento.clientX, y: evento.clientY };
     idDoPonteiro = evento.pointerId;
+    arrasteFoiDetectado = false;
     viewport.classList.add("is-dragging");
-    viewport.setPointerCapture(evento.pointerId);
   });
 
-  viewport.addEventListener("pointerup", finalizarArraste);
-  viewport.addEventListener("pointercancel", finalizarArraste);
+  document.addEventListener("pointermove", (evento) => {
+    if (idDoPonteiro !== evento.pointerId || inicioDoArraste === null) {
+      return;
+    }
+
+    const deslocamentoX = evento.clientX - inicioDoArraste.x;
+    const deslocamentoY = evento.clientY - inicioDoArraste.y;
+    arrasteFoiDetectado = Math.abs(deslocamentoX) > 8 || Math.abs(deslocamentoY) > 8;
+  });
+
+  document.addEventListener("pointerup", finalizarArraste);
+  document.addEventListener("pointercancel", finalizarArraste);
 
   window.addEventListener("keydown", (evento) => {
     if (evento.key === "ArrowLeft") {
