@@ -164,7 +164,7 @@
       return;
     }
 
-    indiceAtivo = edicoes.length - 1;
+    indiceAtivo = 0;
     atualizarCarrossel({ animar: false });
   };
 
