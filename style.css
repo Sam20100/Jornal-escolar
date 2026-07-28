@@ -252,6 +252,11 @@ h1 {
   transform: scale(0.84);
 }
 
+.edition-tile:not(.is-active) {
+  pointer-events: none;
+  cursor: default;
+}
+
 .edition-tile.is-active {
   border-color: var(--color-yellow);
   background: var(--color-yellow);

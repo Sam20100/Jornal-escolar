@@ -15,6 +15,8 @@
   let idDoPonteiro = null;
   let arrasteFoiDetectado = false;
   let frameDeRedimensionamento = null;
+  let scrollBloqueado = false;
+  let timerDoScroll = null;
 
   const obterNumero = (edicao, indice) => {
     const valor = edicao.numero
@@ -56,6 +58,8 @@
 
     botao.className = "edition-tile";
     botao.dataset.index = String(indice);
+    botao.tabIndex = -1;
+    botao.setAttribute("aria-disabled", "true");
     botao.setAttribute("aria-label", pdfUrl
       ? `Abrir edição ${numero} em uma nova aba`
       : `Edição ${numero} sem PDF disponível`);
@@ -70,7 +74,9 @@
       botao.target = "_blank";
       botao.rel = "noopener noreferrer";
       botao.addEventListener("click", (evento) => {
-        if (arrasteFoiDetectado) {
+        const cardEstaAtivo = Number(botao.dataset.index) === indiceAtivo;
+
+        if (arrasteFoiDetectado || !cardEstaAtivo) {
           evento.preventDefault();
           evento.stopPropagation();
           arrasteFoiDetectado = false;
@@ -126,8 +132,11 @@
 
     Array.from(track.children).forEach((tile, indice) => {
       const ativo = indice === indiceAtivo;
+      const podeAbrir = ativo && !tile.classList.contains("is-unavailable");
       tile.classList.toggle("is-active", ativo);
       tile.setAttribute("aria-current", ativo ? "true" : "false");
+      tile.setAttribute("aria-disabled", podeAbrir ? "false" : "true");
+      tile.tabIndex = podeAbrir ? 0 : -1;
     });
 
     anterior.disabled = indiceAtivo === 0;
@@ -188,6 +197,36 @@
 
   anterior.addEventListener("click", () => moverCarrossel(-1));
   proxima.addEventListener("click", () => moverCarrossel(1));
+
+  viewport.addEventListener("wheel", (evento) => {
+    if (edicoes.length < 2) {
+      return;
+    }
+
+    const delta = Math.abs(evento.deltaX) > Math.abs(evento.deltaY)
+      ? evento.deltaX
+      : evento.deltaY;
+    const direcao = delta > 0 ? 1 : -1;
+    const chegouAoLimite = (direcao < 0 && indiceAtivo === 0)
+      || (direcao > 0 && indiceAtivo === edicoes.length - 1);
+
+    if (!delta || chegouAoLimite) {
+      return;
+    }
+
+    evento.preventDefault();
+
+    if (scrollBloqueado) {
+      return;
+    }
+
+    scrollBloqueado = true;
+    moverCarrossel(direcao);
+    window.clearTimeout(timerDoScroll);
+    timerDoScroll = window.setTimeout(() => {
+      scrollBloqueado = false;
+    }, 360);
+  }, { passive: false });
 
   viewport.addEventListener("pointerdown", (evento) => {
     if (!edicoes.length) {
